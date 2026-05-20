@@ -10,8 +10,8 @@ Clone the repository and move into project directory:
 
 Build the container:
 
-`docker build -t name .`
+`docker build -t flask-subnet-calculator .`
 
 Run:
 
-`docker run -p 8080:5000 --detach name`
+`docker run -p 8080:5000 --detach subnet-calculator`

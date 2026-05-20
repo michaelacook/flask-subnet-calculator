@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subnet Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0d0f0e;
+      --surface:   #131715;
+      --border:    #2a3330;
+      --accent:    #00e5a0;
+      --accent-dim:#006b4a;
+      --muted:     #4a5c56;
+      --text:      #c8d8d2;
+      --label:     #607870;
+      --error:     #ff4f4f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 16px 80px;
+    }
+
+    /* grid overlay texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    header {
+      margin-bottom: 40px;
+    }
+
+    .tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--label);
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+    }
+
+    /* Input panel */
+    .input-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .input-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--label);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.15rem;
+      padding: 14px 16px;
+      outline: none;
+      transition: border-color 0.15s;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"]::placeholder { color: var(--accent-dim); }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="text"].error {
+      border-color: var(--error);
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0 32px;
+      cursor: pointer;
+      align-self: flex-end;
+      height: 51px;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    button:hover  { background: #00ffb3; }
+    button:active { transform: scale(0.97); }
+
+    .error-msg {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--error);
+      margin-top: 8px;
+      display: none;
+    }
+
+    .error-msg.visible { display: block; }
+
+    /* Results */
+    .results {
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .results.visible { display: flex; }
+
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 18px 0 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 11px 16px;
+      background: var(--surface);
+      border-left: 2px solid transparent;
+      transition: border-color 0.1s, background 0.1s;
+      gap: 16px;
+    }
+
+    .result-row:hover {
+      border-left-color: var(--accent);
+      background: #161c1a;
+    }
+
+    .result-key {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--label);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .result-val {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--text);
+      text-align: right;
+      word-break: break-all;
+    }
+
+    .result-val.highlight {
+      color: var(--accent);
+      font-size: 1.05rem;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .badge.private  { background: var(--accent-dim); color: var(--accent); }
+    .badge.public   { background: #2a2010; color: #e0a020; }
+
+    /* animation */
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-row {
+      animation: fadeSlide 0.2s ease both;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="tag">// network utility</div>
+      <h1>Subnet<span>Calc</span></h1>
+      <p class="subtitle">IPv4 CIDR subnet analysis</p>
+    </header>
+
+    <div class="input-panel">
+      <div class="input-row">
+        <div class="input-wrap">
+          <label class="input-label" for="cidr">Network / CIDR</label>
+          <input type="text" id="cidr" placeholder="192.168.1.0/24" autocomplete="off" spellcheck="false" />
+        </div>
+        <button id="calc-btn">Calculate</button>
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <div class="results" id="results">
+      <div class="section-label">Addressing</div>
+      <div class="result-row" style="animation-delay:0.02s">
+        <span class="result-key">Network Address</span>
+        <span class="result-val highlight" id="r-network"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.04s">
+        <span class="result-key">Broadcast Address</span>
+        <span class="result-val highlight" id="r-broadcast"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.06s">
+        <span class="result-key">First Usable Host</span>
+        <span class="result-val" id="r-first"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.08s">
+        <span class="result-key">Last Usable Host</span>
+        <span class="result-val" id="r-last"></span>
+      </div>
+
+      <div class="section-label">Mask</div>
+      <div class="result-row" style="animation-delay:0.10s">
+        <span class="result-key">Subnet Mask</span>
+        <span class="result-val" id="r-mask"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.12s">
+        <span class="result-key">Wildcard Mask</span>
+        <span class="result-val" id="r-wildcard"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.14s">
+        <span class="result-key">Prefix Length</span>
+        <span class="result-val" id="r-prefix"></span>
+      </div>
+
+      <div class="section-label">Capacity</div>
+      <div class="result-row" style="animation-delay:0.16s">
+        <span class="result-key">Total Addresses</span>
+        <span class="result-val" id="r-total"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.18s">
+        <span class="result-key">Usable Hosts</span>
+        <span class="result-val" id="r-usable"></span>
+      </div>
+
+      <div class="section-label">Classification</div>
+      <div class="result-row" style="animation-delay:0.20s">
+        <span class="result-key">IP Class</span>
+        <span class="result-val" id="r-class"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.22s">
+        <span class="result-key">Scope</span>
+        <span class="result-val" id="r-private"></span>
+      </div>
+      <div class="result-row" style="animation-delay:0.24s">
+        <span class="result-key">Supernet</span>
+        <span class="result-val" id="r-supernet"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const input   = document.getElementById('cidr');
+    const btn     = document.getElementById('calc-btn');
+    const results = document.getElementById('results');
+    const errMsg  = document.getElementById('error-msg');
+
+    const fields = {
+      'r-network':   d => d.network_address,
+      'r-broadcast': d => d.broadcast_address,
+      'r-first':     d => d.first_host,
+      'r-last':      d => d.last_host,
+      'r-mask':      d => d.subnet_mask,
+      'r-wildcard':  d => d.wildcard_mask,
+      'r-prefix':    d => `/${d.prefix_length}`,
+      'r-total':     d => d.total_addresses.toLocaleString(),
+      'r-usable':    d => d.usable_hosts.toLocaleString(),
+      'r-class':     d => `Class ${d.ip_class}`,
+      'r-supernet':  d => d.supernet,
+    };
+
+    async function calculate() {
+      const cidr = input.value.trim();
+      if (!cidr) return;
+
+      setError(null);
+      results.classList.remove('visible');
+
+      try {
+        const res  = await fetch('/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cidr }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          setError(data.error || 'Invalid input.');
+          return;
+        }
+
+        for (const [id, fn] of Object.entries(fields)) {
+          document.getElementById(id).textContent = fn(data);
+        }
+
+        const privEl = document.getElementById('r-private');
+        privEl.innerHTML = data.is_private
+          ? '<span class="badge private">Private</span>'
+          : '<span class="badge public">Public</span>';
+
+        results.classList.add('visible');
+      } catch (e) {
+        setError('Request failed. Is the server running?');
+      }
+    }
+
+    function setError(msg) {
+      input.classList.toggle('error', !!msg);
+      errMsg.classList.toggle('visible', !!msg);
+      errMsg.textContent = msg || '';
+    }
+
+    btn.addEventListener('click', calculate);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
+  </script>
+</body>
+</html>

@@ -14,4 +14,4 @@ Build the container:
 
 Run:
 
-`docker run -p 8080:5000 --detach subnet-calculator`
+`docker run -p 8080:5000 --detach flask-subnet-calculator`

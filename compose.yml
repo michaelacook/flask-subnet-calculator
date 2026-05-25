@@ -1,6 +1,6 @@
 services:
   web:
-    build: .
+    image: michaelacook/subnet-calculator:latest
     restart: unless-stopped
 
   nginx:

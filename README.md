@@ -1,17 +1,15 @@
 # Subnet Calculator
 
-This is a simple subnet calculator app that runs on Python and Flask. As a sysadmin I have long wanted to increase my familiarity and facility with Docker, so the goal of this project is to containerize the app and deploy it behind an nginx reverse proxy on Ubuntu Server.
+This is a simple subnet calculator app that runs on Python and Flask. The goal of this project is to containerize an app and deploy it behind an Nginx reverse proxy. As a system administrator who works closely with developers, it is my goal to begin understanding containerization and container orchestration.
 
-## Steps to build and run:
+The application image is pulled from Docker Hub along with Nginx. Docker Compose mounts the Nginx configuration and configures it as a reverse proxy in front of the application container.
+
+## Running the application:
 
 Clone the repository and move into project directory:
 
 `git clone https://github.com/michaelacook/flask-subnet-calculator.git && cd flask-subnet-calculator`
 
-Build the container:
+Run the application:
 
-`docker build -t flask-subnet-calculator .`
-
-Run:
-
-`docker run -p 8080:5000 --detach flask-subnet-calculator`
+`docker compose up -d`

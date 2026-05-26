@@ -1,25 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Subnet Calculator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700&display=swap"
+    rel="stylesheet" />
   <style>
     :root {
-      --bg:        #0d0f0e;
-      --surface:   #131715;
-      --border:    #2a3330;
-      --accent:    #00e5a0;
-      --accent-dim:#006b4a;
-      --muted:     #4a5c56;
-      --text:      #c8d8d2;
-      --label:     #607870;
-      --error:     #ff4f4f;
+      --bg: #0d0f0e;
+      --surface: #131715;
+      --border: #2a3330;
+      --accent: #00e5a0;
+      --accent-dim: #006b4a;
+      --muted: #4a5c56;
+      --text: #c8d8d2;
+      --label: #607870;
+      --error: #ff4f4f;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background: var(--bg);
@@ -33,7 +42,6 @@
       padding: 48px 16px 80px;
     }
 
-    /* grid overlay texture */
     body::before {
       content: '';
       position: fixed;
@@ -51,7 +59,7 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 720px;
+      max-width: 900px;
     }
 
     header {
@@ -88,7 +96,6 @@
       letter-spacing: 0.04em;
     }
 
-    /* Input panel */
     .input-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -130,7 +137,9 @@
       letter-spacing: 0.05em;
     }
 
-    input[type="text"]::placeholder { color: var(--accent-dim); }
+    input[type="text"]::placeholder {
+      color: var(--accent-dim);
+    }
 
     input[type="text"]:focus {
       border-color: var(--accent);
@@ -157,8 +166,13 @@
       flex-shrink: 0;
     }
 
-    button:hover  { background: #00ffb3; }
-    button:active { transform: scale(0.97); }
+    button:hover {
+      background: #00ffb3;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
 
     .error-msg {
       font-family: 'Share Tech Mono', monospace;
@@ -168,16 +182,19 @@
       display: none;
     }
 
-    .error-msg.visible { display: block; }
+    .error-msg.visible {
+      display: block;
+    }
 
-    /* Results */
     .results {
       display: none;
       flex-direction: column;
       gap: 2px;
     }
 
-    .results.visible { display: flex; }
+    .results.visible {
+      display: flex;
+    }
 
     .section-label {
       font-family: 'Share Tech Mono', monospace;
@@ -237,13 +254,116 @@
       text-transform: uppercase;
     }
 
-    .badge.private  { background: var(--accent-dim); color: var(--accent); }
-    .badge.public   { background: #2a2010; color: #e0a020; }
+    .badge.private {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
 
-    /* animation */
+    .badge.public {
+      background: #2a2010;
+      color: #e0a020;
+    }
+
+    /* Subnet table */
+    .subnet-table-wrap {
+      display: none;
+      margin-top: 4px;
+      overflow-x: auto;
+    }
+
+    .subnet-table-wrap.visible {
+      display: block;
+    }
+
+    .subnet-table-meta {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      padding: 8px 0 10px;
+    }
+
+    .subnet-table-meta span {
+      color: var(--accent);
+    }
+
+    table.subnet-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    table.subnet-table thead th {
+      background: #0a0c0b;
+      color: var(--label);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    table.subnet-table thead th:first-child {
+      color: var(--accent);
+    }
+
+    table.subnet-table tbody tr {
+      background: var(--surface);
+      border-bottom: 1px solid #1c2220;
+      border-left: 2px solid transparent;
+      transition: background 0.1s, border-left-color 0.1s;
+    }
+
+    table.subnet-table tbody tr:nth-child(even) {
+      background: #101412;
+    }
+
+    table.subnet-table tbody tr:hover {
+      background: #161c1a;
+      border-left-color: var(--accent);
+    }
+
+    table.subnet-table tbody tr.active-subnet {
+      border-left-color: var(--accent);
+      background: #0d1a15;
+    }
+
+    table.subnet-table tbody tr.active-subnet td:first-child {
+      color: var(--accent);
+    }
+
+    table.subnet-table tbody td {
+      padding: 9px 14px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    table.subnet-table tbody td:first-child {
+      color: var(--label);
+    }
+
+    table.subnet-table tbody td.accent {
+      color: var(--accent);
+    }
+
+    table.subnet-table tbody td.dim {
+      color: var(--muted);
+    }
+
     @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .result-row {
@@ -251,6 +371,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="wrapper">
     <header>
@@ -326,27 +447,44 @@
         <span class="result-key">Supernet</span>
         <span class="result-val" id="r-supernet"></span>
       </div>
+
+      <div class="section-label" id="subnet-section-label">Subnet Table</div>
+      <div class="subnet-table-wrap" id="subnet-table-wrap">
+        <div class="subnet-table-meta" id="subnet-table-meta"></div>
+        <table class="subnet-table">
+          <thead>
+            <tr>
+              <th>Network</th>
+              <th>First Host</th>
+              <th>Last Host</th>
+              <th>Broadcast</th>
+              <th>Usable Hosts</th>
+            </tr>
+          </thead>
+          <tbody id="subnet-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <script>
-    const input   = document.getElementById('cidr');
-    const btn     = document.getElementById('calc-btn');
+    const input = document.getElementById('cidr');
+    const btn = document.getElementById('calc-btn');
     const results = document.getElementById('results');
-    const errMsg  = document.getElementById('error-msg');
+    const errMsg = document.getElementById('error-msg');
 
     const fields = {
-      'r-network':   d => d.network_address,
+      'r-network': d => d.network_address,
       'r-broadcast': d => d.broadcast_address,
-      'r-first':     d => d.first_host,
-      'r-last':      d => d.last_host,
-      'r-mask':      d => d.subnet_mask,
-      'r-wildcard':  d => d.wildcard_mask,
-      'r-prefix':    d => `/${d.prefix_length}`,
-      'r-total':     d => d.total_addresses.toLocaleString(),
-      'r-usable':    d => d.usable_hosts.toLocaleString(),
-      'r-class':     d => `Class ${d.ip_class}`,
-      'r-supernet':  d => d.supernet,
+      'r-first': d => d.first_host,
+      'r-last': d => d.last_host,
+      'r-mask': d => d.subnet_mask,
+      'r-wildcard': d => d.wildcard_mask,
+      'r-prefix': d => `/${d.prefix_length}`,
+      'r-total': d => d.total_addresses.toLocaleString(),
+      'r-usable': d => d.usable_hosts.toLocaleString(),
+      'r-class': d => `Class ${d.ip_class}`,
+      'r-supernet': d => d.supernet,
     };
 
     async function calculate() {
@@ -357,14 +495,22 @@
       results.classList.remove('visible');
 
       try {
-        const res  = await fetch('/calculate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ cidr }),
-        });
-        const data = await res.json();
+        const [calcRes, subnetRes] = await Promise.all([
+          fetch('/calculate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cidr }),
+          }),
+          fetch('/subnets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cidr }),
+          }),
+        ]);
 
-        if (!res.ok) {
+        const data = await calcRes.json();
+
+        if (!calcRes.ok) {
           setError(data.error || 'Invalid input.');
           return;
         }
@@ -378,10 +524,41 @@
           ? '<span class="badge private">Private</span>'
           : '<span class="badge public">Public</span>';
 
+        const subnetData = await subnetRes.json();
+        renderSubnetTable(subnetData, data.network_address);
+
         results.classList.add('visible');
       } catch (e) {
         setError('Request failed. Is the server running?');
       }
+    }
+
+    function renderSubnetTable(subnetData, inputNetwork) {
+      const wrap = document.getElementById('subnet-table-wrap');
+      const meta = document.getElementById('subnet-table-meta');
+      const tbody = document.getElementById('subnet-tbody');
+      const label = document.getElementById('subnet-section-label');
+
+      tbody.innerHTML = '';
+      wrap.classList.add('visible');
+
+      const rows = subnetData.rows || [];
+      label.textContent = `Subnet Table — ${subnetData.prefix} networks in ${subnetData.parent}`;
+      meta.innerHTML = `Showing <span>${rows.length.toLocaleString()}</span> subnets &nbsp;·&nbsp; parent <span>${subnetData.parent}</span> &nbsp;·&nbsp; prefix <span>${subnetData.prefix}</span>`;
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        const isActive = row.network === inputNetwork;
+        if (isActive) tr.classList.add('active-subnet');
+        tr.innerHTML = `
+          <td class="${isActive ? 'accent' : ''}">${row.network}</td>
+          <td>${row.first_host}</td>
+          <td>${row.last_host}</td>
+          <td class="dim">${row.broadcast}</td>
+          <td class="dim">${row.usable_hosts.toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     function setError(msg) {
@@ -394,4 +571,5 @@
     input.addEventListener('keydown', e => { if (e.key === 'Enter') calculate(); });
   </script>
 </body>
+
 </html>

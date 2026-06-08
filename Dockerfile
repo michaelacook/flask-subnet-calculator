@@ -10,4 +10,4 @@ RUN pip install -r ./requirements.txt
 
 EXPOSE 5000
 
-ENTRYPOINT [ "python3", "app.py" ]
+ENTRYPOINT [ "gunicorn", "--workers", "3", "--bind", "0.0.0.0:5000", "app:app" ]
